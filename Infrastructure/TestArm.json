@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "AppserviceplanName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+
+        "AppserviceName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('AppserviceplanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2020-12-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "F1",
+                "capacity": 1
+            },
+            "tags": {
+                "displayName": "[parameters('AppserviceplanName')]"
+            },
+            "properties": {
+                "name": "[parameters('AppserviceplanName')]"
+            }
+        },
+        {
+            "name": "[parameters('AppserviceName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2020-12-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('AppserviceplanName'))]": "Resource",
+                "displayName": "[parameters('AppserviceName')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('AppserviceplanName'))]"
+            ],
+            "properties": {
+                "name": "[parameters('AppserviceName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppserviceplanName'))]"
+            }
+        }
+    ],
+    "outputs": {}
+}
